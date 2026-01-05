@@ -3,21 +3,16 @@ title: Rate Limits
 description: API rate limits and best practices
 ---
 
-The API enforces rate limits to ensure fair usage and stability.
+The API enforces rate limits to ensure fair usage and prevent abuse.
 
 ## Rate Limits by Endpoint
 
-| Endpoint | Limit |
-|----------|-------|
-| `POST /addresses` | 100/min |
-| `POST /addresses/batch` | 10/min |
-| `GET /addresses/*` | 300/min |
-| `GET /payments/*` | 300/min |
-| `POST /payments/poll` | 10/min |
-| `GET /health` | 60/min |
-| `GET /chains` | 60/min |
-| `POST /wallets` | 10/min |
-| `GET /wallets/*` | 60/min |
+| Endpoint | Limit | Purpose |
+|----------|-------|---------|
+| `POST /wallets` | 10/min | Wallet creation is resource-intensive |
+| `POST /addresses` | 30/min | Address generation requires HD derivation |
+| `POST /webhooks` | 5/min | Webhook config changes are infrequent |
+| All other endpoints | 100/min | Default rate limit |
 
 ---
 
@@ -41,22 +36,15 @@ X-RateLimit-Reset: 1705764000
 
 ## Rate Limit Response
 
-When rate limited, you receive a `429` response:
+When rate limited, you receive a `429 Too Many Requests` response:
 
 ```json
 {
-  "success": false,
-  "error": {
-    "code": "RATE_LIMITED",
-    "message": "Rate limit exceeded. Try again in 30 seconds.",
-    "details": {
-      "limit": 100,
-      "window": "60s",
-      "retry_after": 30
-    }
-  }
+  "error": "Rate limit exceeded: 10 per 1 minute"
 }
 ```
+
+Wait until the rate limit window resets before retrying.
 
 ---
 

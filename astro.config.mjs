@@ -66,6 +66,7 @@ export default defineConfig({
         {
           label: 'Reference',
           items: [
+            { label: 'Security', slug: 'security' },
             { label: 'Error Codes', slug: 'errors' },
             { label: 'Rate Limits', slug: 'rate-limits' },
             { label: 'SDKs', slug: 'sdks' },
