@@ -1,0 +1,108 @@
+---
+title: Get Payment
+description: Retrieve details for a specific payment
+---
+
+<span class="http-method get">GET</span>
+<span class="endpoint-path">/payments/&#123;tx_hash&#125;</span>
+
+Get detailed information about a specific payment by transaction hash.
+
+---
+
+## Path Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `tx_hash` | string | The blockchain transaction hash |
+
+---
+
+## Example Request
+
+```bash
+curl https://api.yourdomain.com/api/v1/payments/0x8a5f3e2b1c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f \
+  -H "X-API-Key: sk_live_abc123..."
+```
+
+---
+
+## Response
+
+```json
+{
+  "payment_id": "pay_a1b2c3d4e5f6",
+  "chain": "eth",
+  "tx_hash": "0x8a5f3e2b1c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f",
+  "address": "0x742d35Cc6634C0532925a3b844Bc9e7595f8bDe7",
+  "external_id": "user_123456",
+  "amount": "0.5",
+  "amount_raw": "500000000000000000",
+  "amount_usd": "1150.00",
+  "token_contract": null,
+  "token_symbol": "ETH",
+  "status": "confirmed",
+  "confirmations": 15,
+  "required_confirmations": 12,
+  "block_number": 19234567,
+  "block_hash": "0x1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b",
+  "from_address": "0x9876543210abcdef9876543210abcdef98765432",
+  "detected_at": "2024-01-20T14:30:00Z",
+  "confirmed_at": "2024-01-20T14:45:00Z"
+}
+```
+
+---
+
+## Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `payment_id` | string | Unique payment identifier |
+| `chain` | string | Blockchain code |
+| `tx_hash` | string | Transaction hash |
+| `address` | string | Receiving address |
+| `external_id` | string | Your identifier |
+| `amount` | string | Amount (human-readable decimal) |
+| `amount_raw` | string | Amount in smallest unit |
+| `amount_usd` | string/null | USD value at confirmation |
+| `token_contract` | string/null | Token contract (for ERC-20) |
+| `token_symbol` | string | Token symbol (ETH, SOL, XMR, USDT) |
+| `status` | string | Payment status |
+| `confirmations` | integer | Current confirmations |
+| `required_confirmations` | integer | Required for confirmed |
+| `block_number` | integer | Block containing transaction |
+| `block_hash` | string | Block hash |
+| `from_address` | string/null | Sender address (null for XMR) |
+| `detected_at` | datetime | First detection time (ISO 8601) |
+| `confirmed_at` | datetime/null | Confirmation time (ISO 8601) |
+
+---
+
+## Get by Payment ID
+
+<span class="http-method get">GET</span>
+<span class="endpoint-path">/payments/id/&#123;payment_id&#125;</span>
+
+```bash
+curl https://api.yourdomain.com/api/v1/payments/id/pay_a1b2c3d4e5f6 \
+  -H "X-API-Key: sk_live_abc123..."
+```
+
+Returns the same payment response format.
+
+---
+
+## Get by External ID
+
+<span class="http-method get">GET</span>
+<span class="endpoint-path">/payments/by-external/&#123;external_id&#125;</span>
+
+Get all payments for a specific user/account:
+
+```bash
+curl "https://api.yourdomain.com/api/v1/payments/by-external/user_123456?status=confirmed" \
+  -H "X-API-Key: sk_live_abc123..."
+```
+
+Returns a paginated list of payments.

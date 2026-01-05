@@ -1,0 +1,145 @@
+---
+title: Rate Limits
+description: API rate limits and best practices
+---
+
+The API enforces rate limits to ensure fair usage and stability.
+
+## Rate Limits by Endpoint
+
+| Endpoint | Limit |
+|----------|-------|
+| `POST /addresses` | 100/min |
+| `POST /addresses/batch` | 10/min |
+| `GET /addresses/*` | 300/min |
+| `GET /payments/*` | 300/min |
+| `POST /payments/poll` | 10/min |
+| `GET /health` | 60/min |
+| `GET /chains` | 60/min |
+| `POST /wallets` | 10/min |
+| `GET /wallets/*` | 60/min |
+
+---
+
+## Rate Limit Headers
+
+All responses include rate limit headers:
+
+```
+X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 95
+X-RateLimit-Reset: 1705764000
+```
+
+| Header | Description |
+|--------|-------------|
+| `X-RateLimit-Limit` | Maximum requests per window |
+| `X-RateLimit-Remaining` | Remaining requests in window |
+| `X-RateLimit-Reset` | Unix timestamp when window resets |
+
+---
+
+## Rate Limit Response
+
+When rate limited, you receive a `429` response:
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "RATE_LIMITED",
+    "message": "Rate limit exceeded. Try again in 30 seconds.",
+    "details": {
+      "limit": 100,
+      "window": "60s",
+      "retry_after": 30
+    }
+  }
+}
+```
+
+---
+
+## Best Practices
+
+### 1. Use Batch Endpoints
+
+Instead of creating addresses one by one:
+
+```bash
+# Bad: 100 requests
+POST /addresses {"chain": "eth", "external_id": "user_001"}
+POST /addresses {"chain": "eth", "external_id": "user_002"}
+...
+```
+
+Use batch creation:
+
+```bash
+# Good: 1 request
+POST /addresses/batch {
+  "addresses": [
+    {"chain": "eth", "external_id": "user_001"},
+    {"chain": "eth", "external_id": "user_002"},
+    ...
+  ]
+}
+```
+
+### 2. Cache Responses
+
+Address data doesn't change. Cache it:
+
+```python
+from functools import lru_cache
+
+@lru_cache(maxsize=10000)
+def get_user_address(external_id: str, chain: str):
+    return api.get_or_create_address(chain, external_id)
+```
+
+### 3. Use Webhooks
+
+Instead of polling for payments:
+
+```bash
+# Bad: Constant polling
+while True:
+    GET /payments?external_id=user_123&status=confirmed
+    sleep(5)
+```
+
+Use webhooks:
+
+```python
+# Good: Real-time notifications
+@app.post("/webhook")
+def handle_payment(payload):
+    if payload["event"] == "payment.confirmed":
+        process_payment(payload["data"])
+```
+
+### 4. Implement Exponential Backoff
+
+```python
+import time
+
+def api_request_with_retry(func, max_retries=5):
+    for attempt in range(max_retries):
+        response = func()
+
+        if response.status_code == 429:
+            retry_after = response.json()["error"]["details"]["retry_after"]
+            time.sleep(retry_after)
+            continue
+
+        return response
+
+    raise Exception("Max retries exceeded")
+```
+
+---
+
+## Increasing Limits
+
+Contact support if you need higher rate limits for your use case.

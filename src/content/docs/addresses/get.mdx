@@ -1,0 +1,121 @@
+---
+title: Get Address
+description: Retrieve details for a specific address
+---
+
+<span class="http-method get">GET</span>
+<span class="endpoint-path">/addresses/&#123;address&#125;</span>
+
+Get detailed information about a specific deposit address.
+
+---
+
+## Path Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `address` | string | The blockchain address |
+
+---
+
+## Example Request
+
+```bash
+curl https://api.yourdomain.com/api/v1/addresses/0x742d35Cc6634C0532925a3b844Bc9e7595f8bDe7 \
+  -H "X-API-Key: sk_live_abc123..."
+```
+
+---
+
+## Response
+
+```json
+{
+  "address_id": "addr_a1b2c3d4e5f6",
+  "chain": "eth",
+  "address": "0x742d35Cc6634C0532925a3b844Bc9e7595f8bDe7",
+  "external_id": "user_123456",
+  "metadata": {
+    "telegram_id": "987654321",
+    "username": "player1"
+  },
+  "total_received": "1.5",
+  "payment_count": 3,
+  "last_payment_at": "2024-01-19T08:15:00Z",
+  "created_at": "2024-01-15T14:30:00Z"
+}
+```
+
+---
+
+## Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `address_id` | string | Unique address identifier |
+| `chain` | string | Blockchain code |
+| `address` | string | The deposit address |
+| `external_id` | string | Your identifier |
+| `metadata` | object | Custom data |
+| `total_received` | string | Total received (decimal string) |
+| `payment_count` | integer | Number of payments received |
+| `last_payment_at` | datetime | Last payment timestamp (ISO 8601) |
+| `created_at` | datetime | Creation timestamp (ISO 8601) |
+
+---
+
+## Get by External ID
+
+To get all addresses for an external ID across all chains:
+
+<span class="http-method get">GET</span>
+<span class="endpoint-path">/addresses/by-external/&#123;external_id&#125;</span>
+
+```bash
+curl https://api.yourdomain.com/api/v1/addresses/by-external/user_123456 \
+  -H "X-API-Key: sk_live_abc123..."
+```
+
+```json
+{
+  "addresses": [
+    {
+      "address_id": "addr_a1b2c3d4e5f6",
+      "chain": "eth",
+      "address": "0x742d35Cc6634C0532925a3b844Bc9e7595f8bDe7",
+      "external_id": "user_123456",
+      "total_received": "1.5",
+      "payment_count": 3,
+      "created_at": "2024-01-15T14:30:00Z"
+    },
+    {
+      "address_id": "addr_b2c3d4e5f6g7",
+      "chain": "sol",
+      "address": "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU",
+      "external_id": "user_123456",
+      "total_received": "25.0",
+      "payment_count": 5,
+      "created_at": "2024-01-15T14:31:00Z"
+    }
+  ],
+  "total": 2,
+  "limit": 2,
+  "offset": 0
+}
+```
+
+---
+
+## Get by External ID and Chain
+
+To get a specific address for an external ID and chain:
+
+<span class="http-method get">GET</span>
+<span class="endpoint-path">/addresses/by-external/&#123;external_id&#125;/&#123;chain&#125;</span>
+
+```bash
+curl https://api.yourdomain.com/api/v1/addresses/by-external/user_123456/eth \
+  -H "X-API-Key: sk_live_abc123..."
+```
+
+Returns a single address response.

@@ -1,0 +1,162 @@
+---
+title: Error Codes
+description: API error codes and handling
+---
+
+All errors return a consistent JSON structure with HTTP status code.
+
+## Error Response Format
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "INVALID_ADDRESS",
+    "message": "The provided address is not valid for chain 'eth'",
+    "details": {
+      "address": "invalid_address",
+      "chain": "eth"
+    }
+  }
+}
+```
+
+---
+
+## Error Codes Reference
+
+### Authentication Errors (4xx)
+
+| HTTP | Code | Description |
+|------|------|-------------|
+| 401 | `UNAUTHORIZED` | Missing or invalid API key |
+| 403 | `FORBIDDEN` | API key lacks required permissions |
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "UNAUTHORIZED",
+    "message": "Invalid or missing API key"
+  }
+}
+```
+
+---
+
+### Validation Errors (400)
+
+| Code | Description |
+|------|-------------|
+| `INVALID_REQUEST` | Malformed request body |
+| `INVALID_CHAIN` | Unsupported chain code |
+| `INVALID_ADDRESS` | Invalid address format |
+| `MISSING_FIELD` | Required field not provided |
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "INVALID_CHAIN",
+    "message": "Chain 'btc' is not supported",
+    "details": {
+      "provided": "btc",
+      "supported": ["eth", "sol", "xmr", "usdt_eth"]
+    }
+  }
+}
+```
+
+---
+
+### Resource Errors (404, 409)
+
+| HTTP | Code | Description |
+|------|------|-------------|
+| 404 | `NOT_FOUND` | Resource not found |
+| 409 | `ALREADY_EXISTS` | Resource already exists |
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "NOT_FOUND",
+    "message": "Address not found",
+    "details": {
+      "address": "0x123..."
+    }
+  }
+}
+```
+
+---
+
+### Rate Limiting (429)
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "RATE_LIMITED",
+    "message": "Rate limit exceeded. Try again in 30 seconds.",
+    "details": {
+      "limit": 100,
+      "window": "60s",
+      "retry_after": 30
+    }
+  }
+}
+```
+
+---
+
+### Server Errors (5xx)
+
+| HTTP | Code | Description |
+|------|------|-------------|
+| 500 | `INTERNAL_ERROR` | Unexpected server error |
+| 503 | `RPC_UNAVAILABLE` | Blockchain RPC connection failed |
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "RPC_UNAVAILABLE",
+    "message": "Unable to connect to Ethereum RPC",
+    "details": {
+      "chain": "eth",
+      "provider": "alchemy"
+    }
+  }
+}
+```
+
+---
+
+## Handling Errors
+
+```python
+import requests
+
+response = requests.post(
+    "https://api.yourdomain.com/v1/addresses",
+    headers={"Authorization": "Bearer sk_live_..."},
+    json={"chain": "eth", "external_id": "user_123"}
+)
+
+if response.status_code != 200:
+    error = response.json()["error"]
+
+    if error["code"] == "RATE_LIMITED":
+        retry_after = error["details"]["retry_after"]
+        time.sleep(retry_after)
+        # Retry request
+
+    elif error["code"] == "RPC_UNAVAILABLE":
+        # Chain temporarily unavailable
+        # Notify user or queue for later
+
+    else:
+        # Log and handle other errors
+        logger.error(f"API error: {error['code']} - {error['message']}")
+```

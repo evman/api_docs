@@ -1,0 +1,63 @@
+---
+title: Addresses Overview
+description: Generate and manage deposit addresses for users
+---
+
+Addresses are unique deposit destinations generated for each user. They are derived from the HD wallet and remain static forever.
+
+## Key Concepts
+
+- **One address per user per chain** - Each external ID gets a unique address
+- **Static addresses** - Addresses never change or expire
+- **Idempotent creation** - Same external_id + chain always returns the same address
+- **Metadata support** - Attach custom data to addresses
+
+---
+
+## Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/addresses` | Create/get address for external ID |
+| POST | `/addresses/batch` | Create multiple addresses |
+| GET | `/addresses/{address}` | Get address details |
+| GET | `/addresses` | List addresses with filters |
+| GET | `/addresses/by-external/{id}` | Get all addresses for an external ID |
+
+---
+
+## How It Works
+
+```
+Your App                              Wallet API
+   │                                      │
+   │  POST /addresses                     │
+   │  {"chain": "eth",                    │
+   │   "external_id": "user_123"}         │
+   │  ──────────────────────────────────▶ │
+   │                                      │
+   │                                      │  Derive address from
+   │                                      │  HD wallet + next index
+   │                                      │
+   │  {"address": "0xABC...",             │
+   │   "external_id": "user_123"}         │
+   │  ◀────────────────────────────────── │
+   │                                      │
+   │  Show address to user                │
+   │  (same address every time)           │
+   │                                      │
+```
+
+---
+
+## Address Properties
+
+| Property | Description |
+|----------|-------------|
+| `address_id` | Internal unique identifier |
+| `chain` | Blockchain code |
+| `address` | The actual blockchain address |
+| `external_id` | Your user/account identifier |
+| `derivation_index` | HD wallet index used |
+| `metadata` | Custom key-value data |
+| `total_received` | Sum of all payments |

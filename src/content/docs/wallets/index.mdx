@@ -1,0 +1,51 @@
+---
+title: Wallets Overview
+description: Manage HD wallets for cryptocurrency payment processing
+---
+
+Wallets are HD (Hierarchical Deterministic) wallets that generate unique deposit addresses for each chain.
+
+## Key Concepts
+
+- **One wallet per chain** - Each blockchain has its own HD wallet
+- **Unlimited addresses** - Generate as many addresses as needed from a single seed
+- **Secure storage** - Seeds are encrypted and never exposed via API
+- **Automatic backup** - Single seed backup recovers all addresses
+
+---
+
+## Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/wallets` | Create a new wallet |
+| GET | `/wallets` | List all wallets |
+| GET | `/wallets/{chain}` | Get wallet details |
+
+---
+
+## Wallet Lifecycle
+
+```
+1. Create Wallet (once per chain)
+   └── Generates HD seed, stores encrypted
+
+2. Generate Addresses
+   └── Each address derived from seed + index
+
+3. Monitor Payments
+   └── Polling detects incoming transactions
+
+4. Backup (manual, secure)
+   └── Export seed phrase for disaster recovery
+```
+
+---
+
+## Wallet Status
+
+| Status | Description |
+|--------|-------------|
+| `active` | Wallet is operational |
+| `inactive` | Wallet created but not yet configured |
+| `error` | RPC connection or other issue |

@@ -1,0 +1,98 @@
+---
+title: Create Address
+description: Generate a unique deposit address for an external ID
+---
+
+<span class="http-method post">POST</span>
+<span class="endpoint-path">/addresses</span>
+
+Generate a unique deposit address for an external ID. If an address already exists for this ID + chain combination, returns the existing address (idempotent).
+
+---
+
+## Request Body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `chain` | string | Yes | Chain code (e.g., `eth`, `sol`, `xmr`) |
+| `external_id` | string | Yes | Your unique identifier (user ID, account ID) |
+| `metadata` | object | No | Custom key-value data to attach |
+
+---
+
+## Example Request
+
+```bash
+curl -X POST https://api.yourdomain.com/api/v1/addresses \
+  -H "X-API-Key: sk_live_abc123..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "chain": "eth",
+    "external_id": "user_123456",
+    "metadata": {
+      "telegram_id": "987654321",
+      "username": "player1"
+    }
+  }'
+```
+
+---
+
+## Response (201 Created)
+
+```json
+{
+  "address_id": "addr_a1b2c3d4e5f6",
+  "chain": "eth",
+  "address": "0x742d35Cc6634C0532925a3b844Bc9e7595f8bDe7",
+  "external_id": "user_123456",
+  "metadata": {
+    "telegram_id": "987654321",
+    "username": "player1"
+  },
+  "total_received": "0",
+  "payment_count": 0,
+  "created_at": "2024-01-20T14:30:00Z",
+  "is_new": true
+}
+```
+
+---
+
+## Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `address_id` | string | Unique address identifier |
+| `chain` | string | Blockchain code |
+| `address` | string | The deposit address |
+| `external_id` | string | Your identifier |
+| `metadata` | object | Custom data attached |
+| `total_received` | string | Total amount received (decimal string) |
+| `payment_count` | integer | Number of payments received |
+| `created_at` | datetime | Creation timestamp (ISO 8601) |
+| `is_new` | boolean | `true` if just created, `false` if already existed |
+
+---
+
+## Idempotency
+
+The endpoint is idempotent. Calling it multiple times with the same `external_id` and `chain` returns the same address:
+
+```bash
+# First call - creates new address
+POST /addresses {"chain": "eth", "external_id": "user_123"}
+# Response: {"address": "0xABC...", "is_new": true}
+
+# Second call - returns existing address
+POST /addresses {"chain": "eth", "external_id": "user_123"}
+# Response: {"address": "0xABC...", "is_new": false}
+```
+
+---
+
+## Notes
+
+- The address is immediately added to the polling queue
+- Metadata can be updated by calling the endpoint again with new metadata
+- Use meaningful external IDs for easier debugging

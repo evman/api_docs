@@ -1,0 +1,59 @@
+---
+title: Payments Overview
+description: Track cryptocurrency deposits and confirmations
+---
+
+Payments represent incoming cryptocurrency transactions detected on monitored addresses.
+
+## Key Concepts
+
+- **Automatic detection** - Polling service monitors all addresses
+- **Confirmation tracking** - Payments progress through confirmation states
+- **Webhook notifications** - Real-time alerts when payments are detected/confirmed
+- **Historical data** - Full transaction history for each address
+
+---
+
+## Payment Lifecycle
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   pending   │────▶│  confirming │────▶│  confirmed  │
+└─────────────┘     └─────────────┘     └─────────────┘
+       │                                       │
+       └──────────────▶ failed ◀───────────────┘
+                     (rare: reorg)
+```
+
+---
+
+## Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/payments` | List payments with filters |
+| GET | `/payments/{tx_hash}` | Get payment by transaction hash |
+| GET | `/payments/id/{payment_id}` | Get payment by internal ID |
+| POST | `/payments/poll` | Force a polling cycle |
+
+---
+
+## Payment Status
+
+| Status | Description |
+|--------|-------------|
+| `pending` | Transaction seen, waiting for first confirmation |
+| `confirming` | Has confirmations but not yet fully confirmed |
+| `confirmed` | Required confirmations reached |
+| `failed` | Transaction dropped or chain reorganization |
+
+---
+
+## Required Confirmations
+
+| Chain | Confirmations | Approx. Time |
+|-------|---------------|--------------|
+| ETH | 12 blocks | ~3 minutes |
+| USDT | 12 blocks | ~3 minutes |
+| SOL | 32 slots | ~15 seconds |
+| XMR | 10 blocks | ~20 minutes |

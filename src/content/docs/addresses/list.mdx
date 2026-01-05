@@ -1,0 +1,101 @@
+---
+title: List Addresses
+description: Query addresses with filters and pagination
+---
+
+<span class="http-method get">GET</span>
+<span class="endpoint-path">/addresses</span>
+
+List addresses with optional filters and pagination.
+
+---
+
+## Query Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `chain` | string | - | Filter by chain code |
+| `external_id` | string | - | Filter by external ID |
+| `limit` | integer | 50 | Results per page (max 100) |
+| `offset` | integer | 0 | Pagination offset |
+
+---
+
+## Example Request
+
+```bash
+curl "https://api.yourdomain.com/v1/addresses?chain=eth&limit=10" \
+  -H "Authorization: Bearer sk_live_abc123..."
+```
+
+---
+
+## Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "addresses": [
+      {
+        "address_id": "addr_001",
+        "chain": "eth",
+        "address": "0x742d35Cc6634C0532925a3b844Bc9e7595f8bDe7",
+        "external_id": "user_123456",
+        "total_received": "1.5",
+        "payment_count": 3,
+        "created_at": "2024-01-15T14:30:00Z"
+      },
+      {
+        "address_id": "addr_002",
+        "chain": "eth",
+        "address": "0x8F3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
+        "external_id": "user_789012",
+        "total_received": "0.25",
+        "payment_count": 1,
+        "created_at": "2024-01-16T09:15:00Z"
+      }
+    ],
+    "pagination": {
+      "total": 1542,
+      "limit": 10,
+      "offset": 0,
+      "has_more": true
+    }
+  }
+}
+```
+
+---
+
+## Pagination
+
+Use `offset` and `limit` to paginate through results:
+
+```bash
+# First page
+GET /addresses?limit=50&offset=0
+
+# Second page
+GET /addresses?limit=50&offset=50
+
+# Third page
+GET /addresses?limit=50&offset=100
+```
+
+The `has_more` field indicates if more results exist.
+
+---
+
+## Filtering Examples
+
+```bash
+# All ETH addresses
+GET /addresses?chain=eth
+
+# All addresses for a specific user
+GET /addresses?external_id=user_123456
+
+# ETH addresses for a specific user
+GET /addresses?chain=eth&external_id=user_123456
+```

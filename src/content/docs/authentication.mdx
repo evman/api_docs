@@ -1,0 +1,75 @@
+---
+title: Authentication
+description: How to authenticate with the Wallet API
+---
+
+All API requests require authentication using an API key in the `X-API-Key` header.
+
+## API Keys
+
+API keys are at least 32 characters and should be generated securely:
+
+```bash
+# Generate a secure API key
+openssl rand -hex 32
+```
+
+---
+
+## Request Format
+
+Include your API key in the `X-API-Key` header:
+
+```bash
+curl https://api.yourdomain.com/api/v1/wallets \
+  -H "X-API-Key: sk_live_abc123..."
+```
+
+---
+
+## Example Request
+
+```python
+import requests
+
+headers = {
+    "X-API-Key": "sk_live_abc123...",
+    "Content-Type": "application/json"
+}
+
+response = requests.get(
+    "https://api.yourdomain.com/api/v1/wallets",
+    headers=headers
+)
+```
+
+---
+
+## Security Best Practices
+
+:::caution
+Never expose your API key in client-side code or public repositories.
+:::
+
+- Store API keys in environment variables
+- Use strong, randomly generated keys (32+ characters)
+- Rotate keys periodically
+- Use separate keys for different environments
+
+---
+
+## Error Responses
+
+Invalid or missing authentication returns `401 Unauthorized`:
+
+```json
+{
+  "detail": "Missing API key"
+}
+```
+
+```json
+{
+  "detail": "Invalid API key"
+}
+```

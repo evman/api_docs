@@ -1,0 +1,145 @@
+/* Custom styles for Wallet API Docs */
+
+:root {
+  /* Brand colors */
+  --sl-color-accent-low: #1a1f35;
+  --sl-color-accent: #5865f2;
+  --sl-color-accent-high: #8b93f7;
+
+  /* Dark theme adjustments */
+  --sl-color-bg: #0d1117;
+  --sl-color-bg-nav: #161b22;
+  --sl-color-bg-sidebar: #0d1117;
+  --sl-color-hairline-light: #21262d;
+  --sl-color-hairline: #30363d;
+
+  /* Text colors */
+  --sl-color-white: #f0f6fc;
+  --sl-color-gray-1: #c9d1d9;
+  --sl-color-gray-2: #8b949e;
+  --sl-color-gray-3: #6e7681;
+  --sl-color-gray-4: #484f58;
+  --sl-color-gray-5: #30363d;
+  --sl-color-gray-6: #21262d;
+  --sl-color-black: #0d1117;
+}
+
+/* API endpoint badges */
+.http-method {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  font-family: var(--sl-font-mono);
+  text-transform: uppercase;
+  margin-right: 0.5rem;
+}
+
+.http-method.get {
+  background-color: #238636;
+  color: white;
+}
+
+.http-method.post {
+  background-color: #1f6feb;
+  color: white;
+}
+
+.http-method.put {
+  background-color: #9e6a03;
+  color: white;
+}
+
+.http-method.delete {
+  background-color: #da3633;
+  color: white;
+}
+
+/* Endpoint path styling */
+.endpoint-path {
+  font-family: var(--sl-font-mono);
+  font-size: 0.9rem;
+  color: var(--sl-color-gray-1);
+}
+
+/* Parameter tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+}
+
+th, td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--sl-color-hairline);
+}
+
+th {
+  background-color: var(--sl-color-bg-nav);
+  font-weight: 600;
+}
+
+/* Code blocks */
+pre {
+  border-radius: 8px;
+  border: 1px solid var(--sl-color-hairline);
+}
+
+/* Request/Response tabs styling */
+.code-tabs {
+  margin: 1rem 0;
+}
+
+/* Custom callouts */
+.callout {
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+  border-left: 4px solid;
+}
+
+.callout.info {
+  background-color: rgba(88, 101, 242, 0.1);
+  border-color: var(--sl-color-accent);
+}
+
+.callout.warning {
+  background-color: rgba(158, 106, 3, 0.1);
+  border-color: #9e6a03;
+}
+
+.callout.danger {
+  background-color: rgba(218, 54, 51, 0.1);
+  border-color: #da3633;
+}
+
+/* Logo styling */
+.site-title img {
+  height: 2rem;
+}
+
+/* Improve readability */
+.sl-markdown-content {
+  line-height: 1.7;
+}
+
+/* Response status badges */
+.status-badge {
+  display: inline-block;
+  padding: 0.125rem 0.375rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.status-badge.success {
+  background-color: rgba(35, 134, 54, 0.2);
+  color: #3fb950;
+}
+
+.status-badge.error {
+  background-color: rgba(218, 54, 51, 0.2);
+  color: #f85149;
+}

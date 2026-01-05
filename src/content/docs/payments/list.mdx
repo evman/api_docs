@@ -1,0 +1,121 @@
+---
+title: List Payments
+description: Query payments with filters and pagination
+---
+
+<span class="http-method get">GET</span>
+<span class="endpoint-path">/payments</span>
+
+List all detected payments with optional filters.
+
+---
+
+## Query Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `chain` | string | - | Filter by chain |
+| `address` | string | - | Filter by address |
+| `external_id` | string | - | Filter by external ID |
+| `status` | string | - | Filter by status |
+| `min_confirmations` | integer | - | Minimum confirmations |
+| `since` | datetime | - | Payments after this time (ISO 8601) |
+| `limit` | integer | 50 | Results per page (max 100) |
+| `offset` | integer | 0 | Pagination offset |
+
+---
+
+## Example Request
+
+```bash
+curl "https://api.yourdomain.com/api/v1/payments?external_id=user_123456&status=confirmed" \
+  -H "X-API-Key: sk_live_abc123..."
+```
+
+---
+
+## Response
+
+```json
+{
+  "payments": [
+    {
+      "payment_id": "pay_a1b2c3d4e5f6",
+      "chain": "eth",
+      "tx_hash": "0x8a5f3e2b1c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f",
+      "address": "0x742d35Cc6634C0532925a3b844Bc9e7595f8bDe7",
+      "external_id": "user_123456",
+      "amount": "0.5",
+      "amount_raw": "500000000000000000",
+      "amount_usd": null,
+      "token_contract": null,
+      "token_symbol": "ETH",
+      "status": "confirmed",
+      "confirmations": 15,
+      "required_confirmations": 12,
+      "block_number": 19234567,
+      "block_hash": "0xabc123...",
+      "from_address": "0x9876543210abcdef...",
+      "detected_at": "2024-01-20T14:30:00Z",
+      "confirmed_at": "2024-01-20T14:45:00Z"
+    }
+  ],
+  "total": 15,
+  "limit": 50,
+  "offset": 0
+}
+```
+
+---
+
+## Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `payment_id` | string | Unique payment identifier |
+| `chain` | string | Blockchain code |
+| `tx_hash` | string | Transaction hash |
+| `address` | string | Receiving address |
+| `external_id` | string | Your identifier |
+| `amount` | string | Amount (human-readable decimal) |
+| `amount_raw` | string | Amount in smallest unit (wei, lamports, piconero) |
+| `amount_usd` | string/null | USD value at time of detection |
+| `token_contract` | string/null | Token contract address (for ERC-20) |
+| `token_symbol` | string/null | Token symbol (ETH, SOL, XMR, USDT) |
+| `status` | string | Payment status |
+| `confirmations` | integer | Current confirmations |
+| `required_confirmations` | integer | Required for confirmed |
+| `block_number` | integer | Block number |
+| `block_hash` | string | Block hash |
+| `from_address` | string | Sender address (null for XMR) |
+| `detected_at` | datetime | First detection time (ISO 8601) |
+| `confirmed_at` | datetime | Confirmation time (ISO 8601) |
+
+---
+
+## Payment Status Values
+
+| Status | Description |
+|--------|-------------|
+| `pending` | Just detected, 0 confirmations |
+| `confirming` | Has 1+ confirmations, not yet confirmed |
+| `confirmed` | Has required confirmations |
+| `failed` | Transaction failed or was dropped |
+
+---
+
+## Filtering Examples
+
+```bash
+# All confirmed payments
+GET /api/v1/payments?status=confirmed
+
+# Payments for a specific user
+GET /api/v1/payments?external_id=user_123456
+
+# Recent ETH payments
+GET /api/v1/payments?chain=eth&since=2024-01-20T00:00:00Z
+
+# Payments with at least 6 confirmations
+GET /api/v1/payments?min_confirmations=6
+```

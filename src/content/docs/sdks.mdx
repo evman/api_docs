@@ -1,0 +1,225 @@
+---
+title: SDKs & Examples
+description: Client libraries and code examples
+---
+
+## Python SDK
+
+```python
+import requests
+from typing import Optional
+
+class WalletAPI:
+    def __init__(self, api_key: str, base_url: str = "https://api.yourdomain.com/v1"):
+        self.base_url = base_url
+        self.headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        }
+
+    def _request(self, method: str, endpoint: str, data: dict = None):
+        url = f"{self.base_url}{endpoint}"
+        response = requests.request(method, url, headers=self.headers, json=data)
+        response.raise_for_status()
+        return response.json()
+
+    # Wallets
+    def create_wallet(self, chain: str, name: str = None):
+        return self._request("POST", "/wallets", {"chain": chain, "name": name})
+
+    def list_wallets(self):
+        return self._request("GET", "/wallets")
+
+    def get_wallet(self, chain: str):
+        return self._request("GET", f"/wallets/{chain}")
+
+    # Addresses
+    def create_address(self, chain: str, external_id: str, metadata: dict = None):
+        return self._request("POST", "/addresses", {
+            "chain": chain,
+            "external_id": external_id,
+            "metadata": metadata or {}
+        })
+
+    def get_address(self, address: str):
+        return self._request("GET", f"/addresses/{address}")
+
+    def get_addresses_for_user(self, external_id: str):
+        return self._request("GET", f"/addresses/by-external/{external_id}")
+
+    # Payments
+    def list_payments(self, external_id: str = None, status: str = None, chain: str = None):
+        params = {}
+        if external_id:
+            params["external_id"] = external_id
+        if status:
+            params["status"] = status
+        if chain:
+            params["chain"] = chain
+        query = "&".join(f"{k}={v}" for k, v in params.items())
+        return self._request("GET", f"/payments?{query}")
+
+    def get_payment(self, tx_hash: str):
+        return self._request("GET", f"/payments/{tx_hash}")
+```
+
+---
+
+## Usage Examples
+
+### Create Deposit Address
+
+```python
+api = WalletAPI("sk_live_abc123...")
+
+# Generate ETH address for user
+result = api.create_address(
+    chain="eth",
+    external_id="telegram_987654321",
+    metadata={"username": "player1"}
+)
+
+eth_address = result["data"]["address"]
+print(f"Deposit ETH to: {eth_address}")
+```
+
+### Get All User Addresses
+
+```python
+# Get addresses across all chains
+result = api.get_addresses_for_user("telegram_987654321")
+
+for addr in result["data"]["addresses"]:
+    print(f"{addr['chain']}: {addr['address']} (received: {addr['total_received']})")
+```
+
+### Check Confirmed Payments
+
+```python
+# Get confirmed payments for a user
+result = api.list_payments(
+    external_id="telegram_987654321",
+    status="confirmed"
+)
+
+total = 0
+for payment in result["data"]["payments"]:
+    print(f"Received {payment['amount']} {payment['chain']}")
+    total += float(payment["amount"])
+
+print(f"Total received: {total}")
+```
+
+---
+
+## Webhook Handler Example
+
+```python
+from fastapi import FastAPI, Request, HTTPException
+import hmac
+import hashlib
+
+app = FastAPI()
+WEBHOOK_SECRET = "whsec_your_secret"
+
+async def verify_signature(request: Request) -> dict:
+    body = await request.body()
+    signature = request.headers.get("X-Wallet-Signature", "")
+
+    expected = hmac.new(
+        WEBHOOK_SECRET.encode(),
+        body,
+        hashlib.sha256
+    ).hexdigest()
+
+    if not hmac.compare_digest(f"sha256={expected}", signature):
+        raise HTTPException(401, "Invalid signature")
+
+    return await request.json()
+
+@app.post("/webhook/wallet")
+async def wallet_webhook(request: Request):
+    payload = await verify_signature(request)
+
+    event = payload["event"]
+    data = payload["data"]
+
+    if event == "payment.detected":
+        # Notify user payment is being confirmed
+        await notify_user(
+            data["external_id"],
+            f"Payment of {data['amount']} {data['chain']} detected! Waiting for confirmations..."
+        )
+
+    elif event == "payment.confirmed":
+        # Credit user balance
+        await credit_balance(
+            data["external_id"],
+            data["amount"],
+            data["chain"]
+        )
+        await notify_user(
+            data["external_id"],
+            f"Deposit confirmed! +{data['amount']} {data['chain']}"
+        )
+
+    return {"received": True}
+```
+
+---
+
+## Telegram Bot Integration
+
+```python
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import Application, CommandHandler
+
+api = WalletAPI("sk_live_abc123...")
+
+async def deposit(update: Update, context):
+    user_id = str(update.effective_user.id)
+
+    # Get or create addresses for all chains
+    addresses = []
+    for chain in ["eth", "sol", "xmr"]:
+        result = api.create_address(chain, f"tg_{user_id}")
+        addresses.append((chain.upper(), result["data"]["address"]))
+
+    # Format message
+    message = "**Your Deposit Addresses:**\n\n"
+    for chain, addr in addresses:
+        message += f"**{chain}:**\n`{addr}`\n\n"
+
+    await update.message.reply_text(message, parse_mode="Markdown")
+
+async def balance(update: Update, context):
+    user_id = str(update.effective_user.id)
+
+    # Get confirmed payments
+    result = api.list_payments(
+        external_id=f"tg_{user_id}",
+        status="confirmed"
+    )
+
+    # Sum by chain
+    balances = {}
+    for payment in result["data"]["payments"]:
+        chain = payment["chain"]
+        amount = float(payment["amount"])
+        balances[chain] = balances.get(chain, 0) + amount
+
+    if not balances:
+        await update.message.reply_text("No deposits yet!")
+        return
+
+    message = "**Your Deposits:**\n"
+    for chain, amount in balances.items():
+        message += f"{chain.upper()}: {amount}\n"
+
+    await update.message.reply_text(message, parse_mode="Markdown")
+
+# Register handlers
+app = Application.builder().token("BOT_TOKEN").build()
+app.add_handler(CommandHandler("deposit", deposit))
+app.add_handler(CommandHandler("balance", balance))
+```

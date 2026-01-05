@@ -1,0 +1,152 @@
+---
+title: Webhook Verification
+description: Verify webhook signatures for security
+---
+
+All webhooks include a signature header for verification. **Always verify signatures** to ensure webhooks are from the Wallet API.
+
+## Signature Headers
+
+```
+X-Wallet-Signature: sha256=a1b2c3d4e5f6...
+X-Wallet-Timestamp: 1705760700
+```
+
+---
+
+## Verification Process
+
+1. Get the timestamp from `X-Wallet-Timestamp` header
+2. Verify the timestamp is recent (within 5 minutes)
+3. Construct the signed payload: `{timestamp}.{body}`
+4. Compute HMAC-SHA256 using your webhook secret
+5. Compare with the signature header
+
+---
+
+## Python Example
+
+```python
+import hmac
+import hashlib
+import time
+from fastapi import Request, HTTPException
+
+WEBHOOK_SECRET = "whsec_your_secret"
+TIMESTAMP_TOLERANCE = 300  # 5 minutes
+
+async def verify_webhook(request: Request) -> dict:
+    # Get raw body
+    body = await request.body()
+    body_str = body.decode('utf-8')
+
+    # Get headers
+    signature = request.headers.get("X-Wallet-Signature", "")
+    timestamp = request.headers.get("X-Wallet-Timestamp", "")
+
+    # Verify timestamp is recent (prevent replay attacks)
+    try:
+        ts = int(timestamp)
+        if abs(time.time() - ts) > TIMESTAMP_TOLERANCE:
+            raise HTTPException(status_code=401, detail="Timestamp too old")
+    except ValueError:
+        raise HTTPException(status_code=401, detail="Invalid timestamp")
+
+    # Compute expected signature (timestamp.body format)
+    signed_payload = f"{timestamp}.{body_str}"
+    expected = hmac.new(
+        WEBHOOK_SECRET.encode(),
+        signed_payload.encode(),
+        hashlib.sha256
+    ).hexdigest()
+
+    # Compare (timing-safe)
+    if not hmac.compare_digest(f"sha256={expected}", signature):
+        raise HTTPException(status_code=401, detail="Invalid signature")
+
+    # Parse and return payload
+    return await request.json()
+
+@app.post("/api/wallet-webhook")
+async def webhook(request: Request):
+    payload = await verify_webhook(request)
+
+    event = payload["event"]
+    data = payload["data"]
+
+    if event == "payment.confirmed":
+        # Credit user balance
+        external_id = data["external_id"]
+        amount = data["amount"]
+        chain = data["chain"]
+
+        await credit_user_balance(external_id, amount, chain)
+
+    return {"received": True}
+```
+
+---
+
+## Node.js Example
+
+```javascript
+const crypto = require('crypto');
+
+const WEBHOOK_SECRET = 'whsec_your_secret';
+const TIMESTAMP_TOLERANCE = 300; // 5 minutes
+
+function verifyWebhook(body, signature, timestamp, secret) {
+  // Check timestamp is recent
+  const ts = parseInt(timestamp, 10);
+  const now = Math.floor(Date.now() / 1000);
+  if (Math.abs(now - ts) > TIMESTAMP_TOLERANCE) {
+    return false;
+  }
+
+  // Compute expected signature
+  const signedPayload = `${timestamp}.${body}`;
+  const expected = crypto
+    .createHmac('sha256', secret)
+    .update(signedPayload)
+    .digest('hex');
+
+  const trusted = Buffer.from(`sha256=${expected}`, 'utf8');
+  const untrusted = Buffer.from(signature, 'utf8');
+
+  return crypto.timingSafeEqual(trusted, untrusted);
+}
+
+app.post('/api/wallet-webhook', express.raw({type: '*/*'}), (req, res) => {
+  const signature = req.headers['x-wallet-signature'];
+  const timestamp = req.headers['x-wallet-timestamp'];
+  const body = req.body.toString();
+
+  if (!verifyWebhook(body, signature, timestamp, WEBHOOK_SECRET)) {
+    return res.status(401).json({ error: 'Invalid signature' });
+  }
+
+  // Process webhook
+  const { event, data } = JSON.parse(body);
+
+  if (event === 'payment.confirmed') {
+    creditUserBalance(data.external_id, data.amount, data.chain);
+  }
+
+  res.json({ received: true });
+});
+```
+
+---
+
+## Security Best Practices
+
+:::danger
+Never skip signature verification in production!
+:::
+
+1. **Always verify signatures** before processing
+2. **Check timestamp freshness** to prevent replay attacks
+3. **Use timing-safe comparison** to prevent timing attacks
+4. **Store secrets securely** in environment variables
+5. **Use HTTPS** for your webhook endpoint
+6. **Process async** to return quickly and avoid timeouts

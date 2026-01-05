@@ -1,0 +1,81 @@
+---
+title: Supported Chains
+description: Blockchain networks supported by the Wallet API
+---
+
+The Wallet API supports multiple blockchain networks for payment processing.
+
+## Available Chains
+
+### Ethereum (ETH)
+
+| Property | Value |
+|----------|-------|
+| Code | `eth` |
+| Network | Mainnet |
+| Address Format | `0x...` (42 characters) |
+| Decimals | 18 |
+| Required Confirmations | 12 |
+| Polling Interval | 15 seconds |
+
+---
+
+### USDT (ERC-20)
+
+| Property | Value |
+|----------|-------|
+| Code | `usdt_eth` |
+| Network | Ethereum Mainnet |
+| Contract | `0xdAC17F958D2ee523a2206206994597C13D831ec7` |
+| Decimals | 6 |
+| Required Confirmations | 12 |
+| Polling Interval | 15 seconds |
+
+:::note
+USDT uses the same underlying Ethereum address. Create a wallet with chain `usdt_eth` to track USDT ERC-20 transfers.
+:::
+
+---
+
+### Solana (SOL)
+
+| Property | Value |
+|----------|-------|
+| Code | `sol` |
+| Network | Mainnet-beta |
+| Address Format | Base58 (32-44 characters) |
+| Decimals | 9 |
+| Required Confirmations | 32 (finalized) |
+| Polling Interval | 10 seconds |
+
+---
+
+### Monero (XMR)
+
+| Property | Value |
+|----------|-------|
+| Code | `xmr` |
+| Network | Mainnet |
+| Address Format | `4...` or `8...` (95 characters) |
+| Decimals | 12 |
+| Required Confirmations | 10 |
+| Polling Interval | 30 seconds |
+
+:::note
+Monero uses subaddresses for unique deposit addresses. Sender addresses are not visible due to Monero's privacy features.
+:::
+
+---
+
+## Amount Formats
+
+Each chain uses different units for raw amounts:
+
+| Chain | Unit | Conversion |
+|-------|------|------------|
+| ETH | wei | 1 ETH = 10^18 wei |
+| USDT | micro | 1 USDT = 10^6 micro |
+| SOL | lamports | 1 SOL = 10^9 lamports |
+| XMR | piconero | 1 XMR = 10^12 piconero |
+
+API responses include both human-readable `amount` and raw `amount_raw` fields.
