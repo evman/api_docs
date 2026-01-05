@@ -43,7 +43,6 @@ export default defineConfig({
           items: [
             { label: 'Overview', slug: 'addresses' },
             { label: 'Create Address', slug: 'addresses/create' },
-            { label: 'Batch Create', slug: 'addresses/batch' },
             { label: 'Get Address', slug: 'addresses/get' },
             { label: 'List Addresses', slug: 'addresses/list' },
           ],
@@ -54,7 +53,6 @@ export default defineConfig({
             { label: 'Overview', slug: 'payments' },
             { label: 'List Payments', slug: 'payments/list' },
             { label: 'Get Payment', slug: 'payments/get' },
-            { label: 'Force Poll', slug: 'payments/poll' },
           ],
         },
         {
