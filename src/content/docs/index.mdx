@@ -1,6 +1,6 @@
 ---
 title: Wallet API
-description: Cryptocurrency payment processing API for ETH, USDT, Solana, and Monero
+description: Cryptocurrency payment processing API for BTC, ETH, USDT, SOL, XMR, TRX, XRP, and more
 template: splash
 hero:
   tagline: Accept crypto payments with static deposit addresses, HD wallets, and real-time payment detection.
@@ -22,7 +22,7 @@ The Wallet API is a standalone payment service for detecting cryptocurrency depo
 
 <CardGrid>
   <Card title="Multi-Chain Support" icon="rocket">
-    ETH, USDT (ERC-20), Solana, and Monero out of the box.
+    BTC, ETH, LTC, DOGE, SOL, XMR, TRX, XRP, and 20+ tokens.
   </Card>
   <Card title="Static Addresses" icon="document">
     Each user gets a permanent deposit address. No invoices, no expiry.
@@ -54,12 +54,21 @@ The Wallet API is a standalone payment service for detecting cryptocurrency depo
 
 ## Supported Chains
 
-| Chain | Code | Confirmations | Polling |
-|-------|------|---------------|---------|
-| Ethereum | `eth` | 12 blocks | 15s |
-| USDT (ERC-20) | `usdt_eth` | 12 blocks | 15s |
-| Solana | `sol` | 32 slots | 10s |
-| Monero | `xmr` | 10 blocks | 30s |
+| Chain | Code | Confirmations |
+|-------|------|---------------|
+| Bitcoin | `btc` | 6 |
+| Ethereum | `eth` | 12 |
+| Litecoin | `ltc` | 6 |
+| Dogecoin | `doge` | 40 |
+| Zcash | `zec` | 24 |
+| Solana | `sol` | 32 |
+| Monero | `xmr` | 10 |
+| Tron | `trx` | 19 |
+| XRP | `xrp` | 1 |
+| BNB Chain | `bnb` | 15 |
+| Polygon | `polygon` | 128 |
+
+**Tokens:** USDT, USDC, DAI, SHIB on ETH/BNB/Polygon/TRX. [See all chains →](/chains/)
 
 ---
 

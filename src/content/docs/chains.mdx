@@ -5,7 +5,7 @@ description: Blockchain networks supported by the Wallet API
 
 The Wallet API supports multiple blockchain networks for payment processing.
 
-## Available Chains
+## EVM Chains
 
 ### Ethereum (ETH)
 
@@ -16,26 +16,123 @@ The Wallet API supports multiple blockchain networks for payment processing.
 | Address Format | `0x...` (42 characters) |
 | Decimals | 18 |
 | Required Confirmations | 12 |
-| Polling Interval | 15 seconds |
+
+**ERC-20 Tokens on Ethereum:**
+
+| Token | Code | Contract | Decimals |
+|-------|------|----------|----------|
+| USDT | `usdt_eth` | `0xdAC17F958D2ee523a2206206994597C13D831ec7` | 6 |
+| USDC | `usdc_eth` | `0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48` | 6 |
+| DAI | `dai_eth` | `0x6B175474E89094C44Da98b954EcdeCB5f811C44` | 18 |
+| SHIB | `shib_eth` | `0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE` | 18 |
 
 ---
 
-### USDT (ERC-20)
+### BNB Smart Chain (BSC)
 
 | Property | Value |
 |----------|-------|
-| Code | `usdt_eth` |
-| Network | Ethereum Mainnet |
-| Contract | `0xdAC17F958D2ee523a2206206994597C13D831ec7` |
-| Decimals | 6 |
-| Required Confirmations | 12 |
-| Polling Interval | 15 seconds |
+| Code | `bnb` |
+| Network | Mainnet |
+| Address Format | `0x...` (42 characters) |
+| Decimals | 18 |
+| Required Confirmations | 15 |
+
+**BEP-20 Tokens on BSC:**
+
+| Token | Code | Contract | Decimals |
+|-------|------|----------|----------|
+| USDT | `usdt_bnb` | `0x55d398326f99059fF775485246999027B3197955` | 18 |
+| USDC | `usdc_bnb` | `0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d` | 18 |
+| DAI | `dai_bnb` | `0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3` | 18 |
+| SHIB | `shib_bnb` | `0x2859e4544C4bB03966803b044A93563Bd2D0DD4D` | 18 |
+
+---
+
+### Polygon (MATIC)
+
+| Property | Value |
+|----------|-------|
+| Code | `polygon` |
+| Network | Mainnet |
+| Address Format | `0x...` (42 characters) |
+| Decimals | 18 |
+| Required Confirmations | 128 |
+
+**Tokens on Polygon:**
+
+| Token | Code | Contract | Decimals |
+|-------|------|----------|----------|
+| USDT | `usdt_polygon` | `0xc2132D05D31c914a87C6611C10748AEb04B58e8F` | 6 |
+| USDC | `usdc_polygon` | `0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174` | 6 |
+| DAI | `dai_polygon` | `0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063` | 18 |
+| SHIB | `shib_polygon` | `0x6f8a06447Ff6FcF75d803135a7de15CE88C1d4ec` | 18 |
 
 :::note
-USDT uses the same underlying Ethereum address. Create a wallet with chain `usdt_eth` to track USDT ERC-20 transfers.
+EVM tokens share the same underlying address as their native chain. Create a wallet with the token code (e.g., `usdt_eth`) to track that specific token.
 :::
 
 ---
+
+## UTXO Chains
+
+### Bitcoin (BTC)
+
+| Property | Value |
+|----------|-------|
+| Code | `btc` |
+| Network | Mainnet |
+| Address Format | `bc1q...` (Native SegWit / Bech32) |
+| Decimals | 8 |
+| Required Confirmations | 6 |
+
+:::note
+Bitcoin addresses use BIP-84 (Native SegWit) derivation for lower transaction fees.
+:::
+
+---
+
+### Litecoin (LTC)
+
+| Property | Value |
+|----------|-------|
+| Code | `ltc` |
+| Network | Mainnet |
+| Address Format | `ltc1q...` (Native SegWit / Bech32) |
+| Decimals | 8 |
+| Required Confirmations | 6 |
+
+---
+
+### Dogecoin (DOGE)
+
+| Property | Value |
+|----------|-------|
+| Code | `doge` |
+| Network | Mainnet |
+| Address Format | `D...` (P2PKH) |
+| Decimals | 8 |
+| Required Confirmations | 40 |
+
+---
+
+### Zcash (ZEC)
+
+| Property | Value |
+|----------|-------|
+| Code | `zec` |
+| Network | Mainnet |
+| Address Format | `t1...` (Transparent) |
+| Decimals | 8 |
+| Required Confirmations | 24 |
+
+:::note
+The API uses transparent Zcash addresses. Shielded transactions are not currently supported.
+:::
+
+---
+
+## Other Chains
 
 ### Solana (SOL)
 
@@ -46,7 +143,40 @@ USDT uses the same underlying Ethereum address. Create a wallet with chain `usdt
 | Address Format | Base58 (32-44 characters) |
 | Decimals | 9 |
 | Required Confirmations | 32 (finalized) |
-| Polling Interval | 10 seconds |
+
+---
+
+### Tron (TRX)
+
+| Property | Value |
+|----------|-------|
+| Code | `trx` |
+| Network | Mainnet |
+| Address Format | `T...` (Base58check) |
+| Decimals | 6 |
+| Required Confirmations | 19 |
+
+**TRC-20 Tokens on Tron:**
+
+| Token | Code | Contract | Decimals |
+|-------|------|----------|----------|
+| USDT | `usdt_trx` | `TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t` | 6 |
+
+---
+
+### XRP (Ripple)
+
+| Property | Value |
+|----------|-------|
+| Code | `xrp` |
+| Network | Mainnet |
+| Address Format | `r...` (XRP Base58) |
+| Decimals | 6 |
+| Required Confirmations | 1 (ledger validated) |
+
+:::note
+XRP uses a unique base58 alphabet different from Bitcoin. Addresses always start with `r`.
+:::
 
 ---
 
@@ -59,7 +189,6 @@ USDT uses the same underlying Ethereum address. Create a wallet with chain `usdt
 | Address Format | `4...` or `8...` (95 characters) |
 | Decimals | 12 |
 | Required Confirmations | 10 |
-| Polling Interval | 30 seconds |
 
 :::note
 Monero uses subaddresses for unique deposit addresses. Sender addresses are not visible due to Monero's privacy features.
@@ -73,9 +202,27 @@ Each chain uses different units for raw amounts:
 
 | Chain | Unit | Conversion |
 |-------|------|------------|
-| ETH | wei | 1 ETH = 10^18 wei |
-| USDT | micro | 1 USDT = 10^6 micro |
+| ETH/BNB/MATIC | wei | 1 = 10^18 wei |
+| BTC/LTC/DOGE/ZEC | satoshi | 1 = 10^8 satoshi |
+| USDT/USDC (ERC-20) | micro | 1 = 10^6 micro |
+| TRX | sun | 1 TRX = 10^6 sun |
 | SOL | lamports | 1 SOL = 10^9 lamports |
+| XRP | drops | 1 XRP = 10^6 drops |
 | XMR | piconero | 1 XMR = 10^12 piconero |
 
 API responses include both human-readable `amount` and raw `amount_raw` fields.
+
+---
+
+## All Supported Chain Codes
+
+```
+eth, usdt_eth, usdc_eth, dai_eth, shib_eth
+bnb, usdt_bnb, usdc_bnb, dai_bnb, shib_bnb
+polygon, usdt_polygon, usdc_polygon, dai_polygon, shib_polygon
+btc, ltc, doge, zec
+sol
+trx, usdt_trx
+xrp
+xmr
+```
