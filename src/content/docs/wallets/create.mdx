@@ -41,8 +41,12 @@ curl -X POST https://api.yourdomain.com/api/v1/wallets \
   "chain": "eth",
   "name": "Main ETH Wallet",
   "status": "active",
+  "address_count": 0,
   "next_index": 0,
-  "created_at": "2024-01-15T10:30:00Z"
+  "rpc_status": null,
+  "last_block_seen": null,
+  "created_at": "2024-01-15T10:30:00Z",
+  "updated_at": null
 }
 ```
 
@@ -56,8 +60,12 @@ curl -X POST https://api.yourdomain.com/api/v1/wallets \
 | `chain` | string | Blockchain code |
 | `name` | string | Wallet name |
 | `status` | string | Wallet status (`active`) |
+| `address_count` | integer | Number of addresses generated |
 | `next_index` | integer | Next derivation index for address generation |
+| `rpc_status` | string/null | RPC connection status |
+| `last_block_seen` | integer/null | Last scanned block number |
 | `created_at` | datetime | Creation timestamp (ISO 8601) |
+| `updated_at` | datetime/null | Last update timestamp |
 
 ---
 
