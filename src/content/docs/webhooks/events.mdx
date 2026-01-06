@@ -12,14 +12,14 @@ Sent when a new payment is first seen on the blockchain.
   "event": "payment.detected",
   "timestamp": "2024-01-20T14:30:00Z",
   "data": {
-    "payment_id": "pay_a1b2c3d4e5f6",
+    "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
     "chain": "eth",
     "tx_hash": "0x8a5f3e2b1c4d...",
     "address": "0x742d35Cc6634C0532925a3b844Bc9e7595f8bDe7",
-    "external_id": "user_123456",
+    "reference_id": "550e8400-e29b-41d4-a716-446655440000",
     "amount": "0.5",
-    "amount_wei": "500000000000000000",
-    "token": null,
+    "amount_raw": "500000000000000000",
+    "token": "ETH",
     "status": "pending",
     "confirmations": 0,
     "required_confirmations": 12,
@@ -44,11 +44,11 @@ Sent periodically as confirmations increase (optional subscription).
   "event": "payment.confirming",
   "timestamp": "2024-01-20T14:35:00Z",
   "data": {
-    "payment_id": "pay_a1b2c3d4e5f6",
+    "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
     "chain": "eth",
     "tx_hash": "0x8a5f3e2b1c4d...",
     "address": "0x742d35Cc6634C0532925a3b844Bc9e7595f8bDe7",
-    "external_id": "user_123456",
+    "reference_id": "550e8400-e29b-41d4-a716-446655440000",
     "amount": "0.5",
     "status": "confirming",
     "confirmations": 6,
@@ -70,24 +70,21 @@ Sent when payment reaches required confirmations. **This is the event to credit 
   "event": "payment.confirmed",
   "timestamp": "2024-01-20T14:45:00Z",
   "data": {
-    "payment_id": "pay_a1b2c3d4e5f6",
+    "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
     "chain": "eth",
     "tx_hash": "0x8a5f3e2b1c4d...",
     "address": "0x742d35Cc6634C0532925a3b844Bc9e7595f8bDe7",
-    "external_id": "user_123456",
+    "reference_id": "550e8400-e29b-41d4-a716-446655440000",
     "amount": "0.5",
-    "amount_wei": "500000000000000000",
+    "amount_raw": "500000000000000000",
     "amount_usd": "1150.00",
-    "token": null,
+    "token": "ETH",
     "status": "confirmed",
     "confirmations": 12,
     "required_confirmations": 12,
     "from_address": "0x9876543210abcdef...",
     "detected_at": "2024-01-20T14:30:00Z",
-    "confirmed_at": "2024-01-20T14:45:00Z",
-    "metadata": {
-      "telegram_id": "987654321"
-    }
+    "confirmed_at": "2024-01-20T14:45:00Z"
   }
 }
 ```
@@ -103,11 +100,11 @@ Sent if a transaction is dropped or reversed (rare).
   "event": "payment.failed",
   "timestamp": "2024-01-20T14:40:00Z",
   "data": {
-    "payment_id": "pay_a1b2c3d4e5f6",
+    "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
     "chain": "eth",
     "tx_hash": "0x8a5f3e2b1c4d...",
     "address": "0x742d35Cc6634C0532925a3b844Bc9e7595f8bDe7",
-    "external_id": "user_123456",
+    "reference_id": "550e8400-e29b-41d4-a716-446655440000",
     "amount": "0.5",
     "status": "failed",
     "reason": "chain_reorg",

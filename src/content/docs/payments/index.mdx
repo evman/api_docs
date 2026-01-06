@@ -32,9 +32,9 @@ Payments represent incoming cryptocurrency transactions detected on monitored ad
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/payments` | List payments with filters |
-| GET | `/payments/{tx_hash}` | Get payment by transaction hash |
-| GET | `/payments/id/{payment_id}` | Get payment by internal ID |
-| POST | `/payments/poll` | Force a polling cycle |
+| GET | `/payments/{id}` | Get payment by UUID |
+| GET | `/payments/by-tx/{tx_hash}` | Get payment by transaction hash |
+| GET | `/payments/by-reference/{reference_id}` | Get payments by reference_id |
 
 ---
 
@@ -53,7 +53,7 @@ Payments represent incoming cryptocurrency transactions detected on monitored ad
 
 | Chain | Confirmations | Approx. Time |
 |-------|---------------|--------------|
+| BTC | 3 blocks | ~30 minutes |
 | ETH | 12 blocks | ~3 minutes |
-| USDT | 12 blocks | ~3 minutes |
 | SOL | 32 slots | ~15 seconds |
 | XMR | 10 blocks | ~20 minutes |

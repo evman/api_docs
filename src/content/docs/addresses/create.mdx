@@ -1,12 +1,12 @@
 ---
 title: Create Address
-description: Generate a unique deposit address for an external ID
+description: Generate a unique deposit address
 ---
 
 <span class="http-method post">POST</span>
 <span class="endpoint-path">/addresses</span>
 
-Generate a unique deposit address for an external ID. If an address already exists for this ID + chain combination, returns the existing address (idempotent).
+Generate a unique deposit address. If a `reference_id` is provided and an address already exists for that reference_id + chain combination, returns the existing address (idempotent).
 
 ---
 
@@ -15,8 +15,7 @@ Generate a unique deposit address for an external ID. If an address already exis
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `chain` | string | Yes | Chain code (e.g., `btc`, `eth`, `sol`, `trx`, `xrp`). [See all chains →](/chains/) |
-| `external_id` | string | Yes | Your unique identifier (user ID, account ID) |
-| `metadata` | object | No | Custom key-value data to attach |
+| `reference_id` | UUID | No | Optional UUID for client-side correlation |
 
 ---
 
@@ -28,11 +27,7 @@ curl -X POST https://api.yourdomain.com/api/v1/addresses \
   -H "Content-Type: application/json" \
   -d '{
     "chain": "eth",
-    "external_id": "user_123456",
-    "metadata": {
-      "telegram_id": "987654321",
-      "username": "player1"
-    }
+    "reference_id": "550e8400-e29b-41d4-a716-446655440000"
   }'
 ```
 
@@ -42,18 +37,12 @@ curl -X POST https://api.yourdomain.com/api/v1/addresses \
 
 ```json
 {
-  "address_id": "addr_a1b2c3d4e5f6",
+  "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
   "chain": "eth",
   "address": "0x742d35Cc6634C0532925a3b844Bc9e7595f8bDe7",
-  "external_id": "user_123456",
-  "derivation_index": 0,
-  "metadata": {
-    "telegram_id": "987654321",
-    "username": "player1"
-  },
+  "reference_id": "550e8400-e29b-41d4-a716-446655440000",
   "total_received": "0",
   "payment_count": 0,
-  "last_payment_at": null,
   "created_at": "2024-01-20T14:30:00Z",
   "is_new": true
 }
@@ -65,15 +54,12 @@ curl -X POST https://api.yourdomain.com/api/v1/addresses \
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `address_id` | string | Unique address identifier |
+| `id` | UUID | Unique address identifier |
 | `chain` | string | Blockchain code |
 | `address` | string | The deposit address |
-| `external_id` | string | Your identifier |
-| `derivation_index` | integer/null | HD derivation index |
-| `metadata` | object | Custom data attached |
+| `reference_id` | UUID/null | Your correlation ID (if provided) |
 | `total_received` | string | Total amount received (decimal string) |
 | `payment_count` | integer | Number of payments received |
-| `last_payment_at` | datetime/null | Timestamp of last payment |
 | `created_at` | datetime | Creation timestamp (ISO 8601) |
 | `is_new` | boolean | `true` if just created, `false` if already existed |
 
@@ -81,16 +67,28 @@ curl -X POST https://api.yourdomain.com/api/v1/addresses \
 
 ## Idempotency
 
-The endpoint is idempotent. Calling it multiple times with the same `external_id` and `chain` returns the same address:
+When `reference_id` is provided, the endpoint is idempotent. Calling it multiple times with the same `reference_id` and `chain` returns the same address:
 
 ```bash
 # First call - creates new address
-POST /addresses {"chain": "eth", "external_id": "user_123"}
+POST /addresses {"chain": "eth", "reference_id": "550e8400-e29b-41d4-a716-446655440000"}
 # Response: {"address": "0xABC...", "is_new": true}
 
 # Second call - returns existing address
-POST /addresses {"chain": "eth", "external_id": "user_123"}
+POST /addresses {"chain": "eth", "reference_id": "550e8400-e29b-41d4-a716-446655440000"}
 # Response: {"address": "0xABC...", "is_new": false}
+```
+
+When `reference_id` is null/omitted, a new address is always created:
+
+```bash
+# First call - creates new address
+POST /addresses {"chain": "eth"}
+# Response: {"address": "0xABC...", "is_new": true}
+
+# Second call - creates another new address
+POST /addresses {"chain": "eth"}
+# Response: {"address": "0xDEF...", "is_new": true}
 ```
 
 ---
@@ -98,5 +96,5 @@ POST /addresses {"chain": "eth", "external_id": "user_123"}
 ## Notes
 
 - The address is immediately added to the polling queue
-- Metadata can be updated by calling the endpoint again with new metadata
-- Use meaningful external IDs for easier debugging
+- Use `reference_id` when you need to correlate addresses with your system's entities
+- Omit `reference_id` when generating one-time addresses

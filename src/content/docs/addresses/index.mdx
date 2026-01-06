@@ -1,16 +1,16 @@
 ---
 title: Addresses Overview
-description: Generate and manage deposit addresses for users
+description: Generate and manage deposit addresses
 ---
 
-Addresses are unique deposit destinations generated for each user. They are derived from the HD wallet and remain static forever.
+Addresses are unique deposit destinations derived from the HD wallet. They remain static forever.
 
 ## Key Concepts
 
-- **One address per user per chain** - Each external ID gets a unique address
 - **Static addresses** - Addresses never change or expire
-- **Idempotent creation** - Same external_id + chain always returns the same address
-- **Metadata support** - Attach custom data to addresses
+- **Optional reference_id** - Attach a UUID to correlate with your system
+- **Idempotent creation** - Same reference_id + chain always returns the same address
+- **No customer data** - API stores no customer information
 
 ---
 
@@ -18,11 +18,12 @@ Addresses are unique deposit destinations generated for each user. They are deri
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/addresses` | Create/get address for external ID |
-| POST | `/addresses/batch` | Create multiple addresses |
-| GET | `/addresses/{address}` | Get address details |
+| POST | `/addresses` | Create address (optionally with reference_id) |
+| GET | `/addresses/{id}` | Get address by UUID |
 | GET | `/addresses` | List addresses with filters |
-| GET | `/addresses/by-external/{id}` | Get all addresses for an external ID |
+| GET | `/addresses/by-reference/{reference_id}` | Get all addresses for a reference_id |
+| GET | `/addresses/by-reference/{reference_id}/{chain}` | Get address for reference_id + chain |
+| GET | `/addresses/by-address/{blockchain_address}` | Get by blockchain address |
 
 ---
 
@@ -33,18 +34,19 @@ Your App                              Wallet API
    │                                      │
    │  POST /addresses                     │
    │  {"chain": "eth",                    │
-   │   "external_id": "user_123"}         │
+   │   "reference_id": "..."}             │
    │  ──────────────────────────────────▶ │
    │                                      │
    │                                      │  Derive address from
    │                                      │  HD wallet + next index
    │                                      │
    │  {"address": "0xABC...",             │
-   │   "external_id": "user_123"}         │
+   │   "id": "f47ac10b-..."}              │
    │  ◀────────────────────────────────── │
    │                                      │
    │  Show address to user                │
-   │  (same address every time)           │
+   │  (same address every time            │
+   │   for same reference_id)             │
    │                                      │
 ```
 
@@ -54,10 +56,9 @@ Your App                              Wallet API
 
 | Property | Description |
 |----------|-------------|
-| `address_id` | Internal unique identifier |
+| `id` | UUID identifier |
 | `chain` | Blockchain code |
 | `address` | The actual blockchain address |
-| `external_id` | Your user/account identifier |
-| `derivation_index` | HD wallet index used |
-| `metadata` | Custom key-value data |
+| `reference_id` | Your correlation UUID (optional) |
 | `total_received` | Sum of all payments |
+| `payment_count` | Number of payments received |

@@ -90,12 +90,12 @@ curl -X POST https://api.yourdomain.com/v1/wallets \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -d '{"chain": "eth"}'
 
-# 2. Generate address for a user
+# 2. Generate address (optionally with reference_id)
 curl -X POST https://api.yourdomain.com/v1/addresses \
   -H "Authorization: Bearer YOUR_API_KEY" \
-  -d '{"chain": "eth", "external_id": "user_123"}'
+  -d '{"chain": "eth", "reference_id": "550e8400-e29b-41d4-a716-446655440000"}'
 
-# 3. Check for payments
-curl https://api.yourdomain.com/v1/payments?external_id=user_123 \
+# 3. Check for payments by reference
+curl https://api.yourdomain.com/v1/payments/by-reference/550e8400-e29b-41d4-a716-446655440000 \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```

@@ -15,7 +15,6 @@ List addresses with optional filters and pagination.
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `chain` | string | - | Filter by chain code |
-| `external_id` | string | - | Filter by external ID |
 | `limit` | integer | 50 | Results per page (max 100) |
 | `offset` | integer | 0 | Pagination offset |
 
@@ -24,8 +23,8 @@ List addresses with optional filters and pagination.
 ## Example Request
 
 ```bash
-curl "https://api.yourdomain.com/v1/addresses?chain=eth&limit=10" \
-  -H "Authorization: Bearer sk_live_abc123..."
+curl "https://api.yourdomain.com/api/v1/addresses?chain=eth&limit=10" \
+  -H "X-API-Key: sk_live_abc123..."
 ```
 
 ---
@@ -34,35 +33,29 @@ curl "https://api.yourdomain.com/v1/addresses?chain=eth&limit=10" \
 
 ```json
 {
-  "success": true,
-  "data": {
-    "addresses": [
-      {
-        "address_id": "addr_001",
-        "chain": "eth",
-        "address": "0x742d35Cc6634C0532925a3b844Bc9e7595f8bDe7",
-        "external_id": "user_123456",
-        "total_received": "1.5",
-        "payment_count": 3,
-        "created_at": "2024-01-15T14:30:00Z"
-      },
-      {
-        "address_id": "addr_002",
-        "chain": "eth",
-        "address": "0x8F3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
-        "external_id": "user_789012",
-        "total_received": "0.25",
-        "payment_count": 1,
-        "created_at": "2024-01-16T09:15:00Z"
-      }
-    ],
-    "pagination": {
-      "total": 1542,
-      "limit": 10,
-      "offset": 0,
-      "has_more": true
+  "addresses": [
+    {
+      "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+      "chain": "eth",
+      "address": "0x742d35Cc6634C0532925a3b844Bc9e7595f8bDe7",
+      "reference_id": "550e8400-e29b-41d4-a716-446655440000",
+      "total_received": "1.5",
+      "payment_count": 3,
+      "created_at": "2024-01-15T14:30:00Z"
+    },
+    {
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "chain": "eth",
+      "address": "0x8F3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
+      "reference_id": null,
+      "total_received": "0.25",
+      "payment_count": 1,
+      "created_at": "2024-01-16T09:15:00Z"
     }
-  }
+  ],
+  "total": 1542,
+  "limit": 10,
+  "offset": 0
 }
 ```
 
@@ -83,8 +76,6 @@ GET /addresses?limit=50&offset=50
 GET /addresses?limit=50&offset=100
 ```
 
-The `has_more` field indicates if more results exist.
-
 ---
 
 ## Filtering Examples
@@ -93,9 +84,9 @@ The `has_more` field indicates if more results exist.
 # All ETH addresses
 GET /addresses?chain=eth
 
-# All addresses for a specific user
-GET /addresses?external_id=user_123456
+# All BTC addresses
+GET /addresses?chain=btc
 
-# ETH addresses for a specific user
-GET /addresses?chain=eth&external_id=user_123456
+# Paginated results
+GET /addresses?limit=20&offset=40
 ```
