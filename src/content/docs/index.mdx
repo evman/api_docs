@@ -22,7 +22,7 @@ The Wallet API is a standalone payment service for detecting cryptocurrency depo
 
 <CardGrid>
   <Card title="Multi-Chain Support" icon="rocket">
-    BTC, ETH, LTC, DOGE, SOL, XMR, TRX, XRP, and 20+ tokens.
+    BTC, ETH, LTC, SOL, XMR, TRX, XRP, BNB, Polygon, and 20+ tokens.
   </Card>
   <Card title="Static Addresses" icon="document">
     Each user gets a permanent deposit address. No invoices, no expiry.
@@ -59,8 +59,6 @@ The Wallet API is a standalone payment service for detecting cryptocurrency depo
 | Bitcoin | `btc` | 6 |
 | Ethereum | `eth` | 12 |
 | Litecoin | `ltc` | 6 |
-| Dogecoin | `doge` | 40 |
-| Zcash | `zec` | 24 |
 | Solana | `sol` | 32 |
 | Monero | `xmr` | 10 |
 | Tron | `trx` | 19 |
@@ -78,7 +76,7 @@ The Wallet API is a standalone payment service for detecting cryptocurrency depo
 https://api.yourdomain.com/v1
 ```
 
-All API requests require authentication via Bearer token.
+All API requests require authentication via `X-API-Key` header.
 
 ---
 
@@ -86,16 +84,18 @@ All API requests require authentication via Bearer token.
 
 ```bash
 # 1. Create a wallet
-curl -X POST https://api.yourdomain.com/v1/wallets \
-  -H "Authorization: Bearer YOUR_API_KEY" \
+curl -X POST https://api.yourdomain.com/api/v1/wallets \
+  -H "X-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
   -d '{"chain": "eth"}'
 
 # 2. Generate address (optionally with reference_id)
-curl -X POST https://api.yourdomain.com/v1/addresses \
-  -H "Authorization: Bearer YOUR_API_KEY" \
+curl -X POST https://api.yourdomain.com/api/v1/addresses \
+  -H "X-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
   -d '{"chain": "eth", "reference_id": "550e8400-e29b-41d4-a716-446655440000"}'
 
 # 3. Check for payments by reference
-curl https://api.yourdomain.com/v1/payments/by-reference/550e8400-e29b-41d4-a716-446655440000 \
-  -H "Authorization: Bearer YOUR_API_KEY"
+curl https://api.yourdomain.com/api/v1/payments/by-reference/550e8400-e29b-41d4-a716-446655440000 \
+  -H "X-API-Key: YOUR_API_KEY"
 ```

@@ -10,10 +10,10 @@ import requests
 from typing import Optional
 
 class WalletAPI:
-    def __init__(self, api_key: str, base_url: str = "https://api.yourdomain.com/v1"):
+    def __init__(self, api_key: str, base_url: str = "https://api.yourdomain.com/api/v1"):
         self.base_url = base_url
         self.headers = {
-            "Authorization": f"Bearer {api_key}",
+            "X-API-Key": api_key,
             "Content-Type": "application/json"
         }
 
@@ -34,24 +34,23 @@ class WalletAPI:
         return self._request("GET", f"/wallets/{chain}")
 
     # Addresses
-    def create_address(self, chain: str, external_id: str, metadata: dict = None):
-        return self._request("POST", "/addresses", {
-            "chain": chain,
-            "external_id": external_id,
-            "metadata": metadata or {}
-        })
+    def create_address(self, chain: str, reference_id: str = None):
+        data = {"chain": chain}
+        if reference_id:
+            data["reference_id"] = reference_id
+        return self._request("POST", "/addresses", data)
 
     def get_address(self, address: str):
         return self._request("GET", f"/addresses/{address}")
 
-    def get_addresses_for_user(self, external_id: str):
-        return self._request("GET", f"/addresses/by-external/{external_id}")
+    def get_addresses_by_reference(self, reference_id: str):
+        return self._request("GET", f"/addresses/by-reference/{reference_id}")
 
     # Payments
-    def list_payments(self, external_id: str = None, status: str = None, chain: str = None):
+    def list_payments(self, reference_id: str = None, status: str = None, chain: str = None):
         params = {}
-        if external_id:
-            params["external_id"] = external_id
+        if reference_id:
+            params["reference_id"] = reference_id
         if status:
             params["status"] = status
         if chain:
@@ -72,22 +71,21 @@ class WalletAPI:
 ```python
 api = WalletAPI("sk_live_abc123...")
 
-# Generate ETH address for user
+# Generate ETH address with a reference ID for your user
 result = api.create_address(
     chain="eth",
-    external_id="telegram_987654321",
-    metadata={"username": "player1"}
+    reference_id="550e8400-e29b-41d4-a716-446655440000"  # Your user's UUID
 )
 
 eth_address = result["data"]["address"]
 print(f"Deposit ETH to: {eth_address}")
 ```
 
-### Get All User Addresses
+### Get User Addresses by Reference
 
 ```python
-# Get addresses across all chains
-result = api.get_addresses_for_user("telegram_987654321")
+# Get addresses by reference ID
+result = api.get_addresses_by_reference("550e8400-e29b-41d4-a716-446655440000")
 
 for addr in result["data"]["addresses"]:
     print(f"{addr['chain']}: {addr['address']} (received: {addr['total_received']})")
@@ -96,9 +94,9 @@ for addr in result["data"]["addresses"]:
 ### Check Confirmed Payments
 
 ```python
-# Get confirmed payments for a user
+# Get confirmed payments for a reference
 result = api.list_payments(
-    external_id="telegram_987654321",
+    reference_id="550e8400-e29b-41d4-a716-446655440000",
     status="confirmed"
 )
 
@@ -147,19 +145,19 @@ async def wallet_webhook(request: Request):
     if event == "payment.detected":
         # Notify user payment is being confirmed
         await notify_user(
-            data["external_id"],
+            data["reference_id"],
             f"Payment of {data['amount']} {data['chain']} detected! Waiting for confirmations..."
         )
 
     elif event == "payment.confirmed":
         # Credit user balance
         await credit_balance(
-            data["external_id"],
+            data["reference_id"],
             data["amount"],
             data["chain"]
         )
         await notify_user(
-            data["external_id"],
+            data["reference_id"],
             f"Deposit confirmed! +{data['amount']} {data['chain']}"
         )
 
@@ -178,11 +176,14 @@ api = WalletAPI("sk_live_abc123...")
 
 async def deposit(update: Update, context):
     user_id = str(update.effective_user.id)
+    # Use a UUID for reference_id (generate from user_id or store in your DB)
+    import uuid
+    reference_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, f"tg_{user_id}"))
 
     # Get or create addresses for all chains
     addresses = []
     for chain in ["eth", "sol", "xmr"]:
-        result = api.create_address(chain, f"tg_{user_id}")
+        result = api.create_address(chain, reference_id)
         addresses.append((chain.upper(), result["data"]["address"]))
 
     # Format message
@@ -194,10 +195,11 @@ async def deposit(update: Update, context):
 
 async def balance(update: Update, context):
     user_id = str(update.effective_user.id)
+    reference_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, f"tg_{user_id}"))
 
     # Get confirmed payments
     result = api.list_payments(
-        external_id=f"tg_{user_id}",
+        reference_id=reference_id,
         status="confirmed"
     )
 

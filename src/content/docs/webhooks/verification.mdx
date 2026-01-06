@@ -76,11 +76,11 @@ async def webhook(request: Request):
 
     if event == "payment.confirmed":
         # Credit user balance
-        external_id = data["external_id"]
+        reference_id = data["reference_id"]
         amount = data["amount"]
         chain = data["chain"]
 
-        await credit_user_balance(external_id, amount, chain)
+        await credit_user_balance(reference_id, amount, chain)
 
     return {"received": True}
 ```
@@ -129,7 +129,7 @@ app.post('/api/wallet-webhook', express.raw({type: '*/*'}), (req, res) => {
   const { event, data } = JSON.parse(body);
 
   if (event === 'payment.confirmed') {
-    creditUserBalance(data.external_id, data.amount, data.chain);
+    creditUserBalance(data.reference_id, data.amount, data.chain);
   }
 
   res.json({ received: true });

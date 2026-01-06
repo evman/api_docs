@@ -104,34 +104,6 @@ Bitcoin addresses use BIP-84 (Native SegWit) derivation for lower transaction fe
 
 ---
 
-### Dogecoin (DOGE)
-
-| Property | Value |
-|----------|-------|
-| Code | `doge` |
-| Network | Mainnet |
-| Address Format | `D...` (P2PKH) |
-| Decimals | 8 |
-| Required Confirmations | 40 |
-
----
-
-### Zcash (ZEC)
-
-| Property | Value |
-|----------|-------|
-| Code | `zec` |
-| Network | Mainnet |
-| Address Format | `t1...` (Transparent) |
-| Decimals | 8 |
-| Required Confirmations | 24 |
-
-:::note
-The API uses transparent Zcash addresses. Shielded transactions are not currently supported.
-:::
-
----
-
 ## Other Chains
 
 ### Solana (SOL)
@@ -203,7 +175,7 @@ Each chain uses different units for raw amounts:
 | Chain | Unit | Conversion |
 |-------|------|------------|
 | ETH/BNB/MATIC | wei | 1 = 10^18 wei |
-| BTC/LTC/DOGE/ZEC | satoshi | 1 = 10^8 satoshi |
+| BTC/LTC | satoshi | 1 = 10^8 satoshi |
 | USDT/USDC (ERC-20) | micro | 1 = 10^6 micro |
 | TRX | sun | 1 TRX = 10^6 sun |
 | SOL | lamports | 1 SOL = 10^9 lamports |
@@ -220,7 +192,7 @@ API responses include both human-readable `amount` and raw `amount_raw` fields.
 eth, usdt_eth, usdc_eth, dai_eth, shib_eth
 bnb, usdt_bnb, usdc_bnb, dai_bnb, shib_bnb
 polygon, usdt_polygon, usdc_polygon, dai_polygon, shib_polygon
-btc, ltc, doge, zec
+btc, ltc
 sol
 trx, usdt_trx
 xrp

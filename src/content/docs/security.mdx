@@ -40,10 +40,9 @@ All user inputs are strictly validated:
 
 | Field | Validation |
 |-------|------------|
-| `chain` | Must be one of 27 supported chain codes |
-| `external_id` | Blocks `<`, `>`, `"`, `'`, `\`, newlines, null bytes |
+| `chain` | Must be one of supported chain codes |
+| `reference_id` | Must be valid UUID format |
 | `name` | Blocks `<`, `>`, newlines, null bytes |
-| `metadata` | Maximum 10KB size limit |
 | `webhook.url` | Must be valid HTTPS URL, blocks internal IPs |
 | `webhook.events` | Must be valid event types only |
 

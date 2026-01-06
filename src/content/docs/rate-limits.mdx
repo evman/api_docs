@@ -56,8 +56,8 @@ Instead of creating addresses one by one:
 
 ```bash
 # Bad: 100 requests
-POST /addresses {"chain": "eth", "external_id": "user_001"}
-POST /addresses {"chain": "eth", "external_id": "user_002"}
+POST /addresses {"chain": "eth", "reference_id": "uuid-001"}
+POST /addresses {"chain": "eth", "reference_id": "uuid-002"}
 ...
 ```
 
@@ -67,8 +67,8 @@ Use batch creation:
 # Good: 1 request
 POST /addresses/batch {
   "addresses": [
-    {"chain": "eth", "external_id": "user_001"},
-    {"chain": "eth", "external_id": "user_002"},
+    {"chain": "eth", "reference_id": "uuid-001"},
+    {"chain": "eth", "reference_id": "uuid-002"},
     ...
   ]
 }
@@ -82,8 +82,8 @@ Address data doesn't change. Cache it:
 from functools import lru_cache
 
 @lru_cache(maxsize=10000)
-def get_user_address(external_id: str, chain: str):
-    return api.get_or_create_address(chain, external_id)
+def get_user_address(reference_id: str, chain: str):
+    return api.get_or_create_address(chain, reference_id)
 ```
 
 ### 3. Use Webhooks
@@ -93,7 +93,7 @@ Instead of polling for payments:
 ```bash
 # Bad: Constant polling
 while True:
-    GET /payments?external_id=user_123&status=confirmed
+    GET /payments?reference_id=uuid-123&status=confirmed
     sleep(5)
 ```
 
